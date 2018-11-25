@@ -1,0 +1,39 @@
+#include <SPI.h>
+#include <SD.h>
+
+File myFile;
+
+void setup(){
+  Serial1.begin(9600);
+  Serial.begin(9600);
+  delay(5000);
+  Serial.flush();
+  Serial1.flush();
+
+  Serial.print("Initializing SD card...");
+  if (!SD.begin(SDCARD_SS_PIN)){
+    Serial.println("initialization failed!");
+    while (1);
+  }
+  while (Serial1.available()) // read from SDK port, send to Serial port to interupt send 'c' without line ending
+  {
+    int inByte = Serial1.read();
+    Serial.write(inByte);
+  }
+  Serial.println();
+  Serial.println("initialization done.");
+  Serial.println("Finished Setup");
+  Serial.println("Sensor #, Conc.(PPB), Temp.(C), Rh (%),Conc. (Counts), Temp. (Counts), Rh (%Counts), Days, Hours, Minutes, Seconds");
+  Serial1.write('c');
+}
+
+void loop(){
+myFile = SD.open("piec.txt", FILE_WRITE);
+  while (Serial1.available()) // read from SDK port, send to serial and SD
+  {
+    int inByte = Serial1.read();
+    myFile.write(inByte);
+    Serial.write(inByte);
+  }
+  myFile.close();
+}
