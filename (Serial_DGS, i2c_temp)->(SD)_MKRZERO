@@ -1,0 +1,78 @@
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <SPI.h>
+#include <SD.h>
+
+#define ONE_WIRE_BUS 3
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+DeviceAddress insideThermometer;
+
+File myFile;
+
+void setup(){
+  Serial1.begin(9600);
+  Serial1.flush();
+  Serial.begin(9600);
+  Serial.flush();
+ ///////////////////////////////////////////////TEMP//////////////////////////////////////////////////////////
+  Serial.print("Locating devices...");
+  sensors.begin();
+  Serial.print("Found ");
+  Serial.print(sensors.getDeviceCount(), DEC);
+  Serial.println(" devices.");
+  Serial.print("Parasite power is: "); 
+  if (sensors.isParasitePowerMode()) Serial.println("ON");
+  else Serial.println("OFF");
+  if (!sensors.getAddress(insideThermometer, 0)) Serial.println("Unable to find address for Device 0"); 
+  Serial.print("Device 0 Address: ");
+  printAddress(insideThermometer);
+  Serial.println();
+  sensors.setResolution(insideThermometer, 9);
+  Serial.print("Device 0 Resolution: ");
+  Serial.print(sensors.getResolution(insideThermometer), DEC); 
+  Serial.println();
+////////////////////////////////////////////////////SD///////////////////////////////////////////////////////
+  Serial.print("Initializing SD card...");
+  if (!SD.begin(SDCARD_SS_PIN)){
+    Serial.println("initialization failed!");
+    while (1);
+  }
+  Serial.println("initialization done.");
+//////////////////////////////////////////////////////DGS/////////////////////////////////////////////////////
+  while (Serial1.available()) // read from SDK port, send to Serial port to interupt send 'c' without line ending
+  {
+    int inByte = Serial1.read();
+    Serial.write(inByte);
+  }
+  Serial.println();
+  Serial.println("Finished Setup");
+  Serial.println("Sensor #, Conc.(PPB), Temp.(C), Rh (%),Conc. (Counts), Temp. (Counts), Rh (%Counts), Days, Hours, Minutes, Seconds");
+  Serial1.write('c');
+}
+
+void loop(){
+myFile = SD.open("szesc.txt", FILE_WRITE);
+ // while (Serial1.available()){ // read from SDK port, send to serial and SD 
+///////////////////////////////////////////////////DGS////////////////////////////////////////////////////////
+    int inByte = Serial1.read();
+    myFile.write(inByte);
+    Serial.write(inByte);
+    Serial.println();
+//////////////////////////////////////////////////TEMP/////////////////////////////////////////////////////////
+  sensors.requestTemperatures(); // Send the command to get temperatures  
+  float tempC = sensors.getTempC(insideThermometer);
+  myFile.println(tempC);
+  Serial.print(tempC);
+  Serial.println();
+//  }
+  myFile.close();
+}
+void printAddress(DeviceAddress deviceAddress)
+{
+  for (uint8_t i = 0; i < 8; i++)
+  {
+    if (deviceAddress[i] < 16) Serial.print("0");
+    Serial.print(deviceAddress[i], HEX);
+  }
+}
