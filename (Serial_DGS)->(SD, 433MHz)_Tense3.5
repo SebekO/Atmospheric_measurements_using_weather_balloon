@@ -1,0 +1,60 @@
+#include <SPI.h>
+#include <SD.h>
+File myFile;
+// set this to the hardware serial port you wish to use
+#define H2S Serial1
+#define O3 Serial2
+#define TELE Serial3
+
+
+void setup(){
+  Serial.begin(9600);
+  H2S.begin(9600);
+  O3.begin(9600);
+  TELE.begin(9600);
+  
+  Serial.flush();
+  H2S.flush();
+  O3.flush();
+  TELE.flush();
+
+  Serial.print("Initializing SD card...");
+  if (!SD.begin(BUILTIN_SDCARD)){
+    Serial.println("initialization failed!");
+    while (1);
+  }
+  while (H2S.available()&&O3.available()) // read from SDK port, send to Serial port to interupt send 'c' without line ending
+  {
+    int inByte1 = H2S.read();
+    int inByte2 = O3.read();
+    Serial.write(inByte1);
+    Serial.write(inByte2);
+  }
+  Serial.println();
+  Serial.println("initialization done.");
+  Serial.println("Finished Setup");
+  Serial.println("Sensor #, Conc.(PPB), Temp.(C), Rh (%),Conc. (Counts), Temp. (Counts), Rh (%Counts), Days, Hours, Minutes, Seconds");
+  H2S.write('c');
+  O3.write('c');
+}
+
+void loop(){
+  myFile = SD.open("dane.txt", FILE_WRITE);       
+  if (H2S.available()&&O3.available() > 0) {
+    int inByte1 = H2S.read();
+    int inByte2 = O3.read();
+    myFile.write(inByte1);
+    myFile.write('\n');
+    myFile.write(inByte2);
+    myFile.write('\n');
+    Serial.write(inByte1);
+    Serial.write('\n');
+    Serial.write(inByte2);
+    Serial.write('\n');
+    TELE.write(inByte1);
+    TELE.write('\n');
+    TELE.write(inByte2);
+    TELE.write('\n');
+  }
+  myFile.close();
+}
