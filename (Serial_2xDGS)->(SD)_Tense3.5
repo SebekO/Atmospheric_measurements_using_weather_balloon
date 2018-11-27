@@ -1,0 +1,47 @@
+#include <SPI.h>
+#include <SD.h>
+File myFile;
+// set this to the hardware serial port you wish to use
+#define time 50
+
+void setup(){
+  Serial.begin(9600);
+  Serial1.begin(9600);
+  Serial2.begin(9600);
+ // Serial3.begin(9600);
+ 
+  Serial1.setTimeout(time);
+  Serial2.setTimeout(time);
+  
+  Serial.flush();
+  Serial1.flush();
+  Serial2.flush();
+ // Serial3.flush();
+
+  Serial.print("Initializing SD card...");
+  if (!SD.begin(BUILTIN_SDCARD)){
+    Serial.println("initialization failed!");
+    while (1);
+  }
+
+  Serial.println();
+  Serial.println("initialization done.");
+  Serial.println("Finished Setup");
+  Serial.println("Sensor #, Conc.(PPB), Temp.(C), Rh (%),Conc. (Counts), Temp. (Counts), Rh (%Counts), Days, Hours, Minutes, Seconds");
+  Serial1.write('c');
+  delay(time);
+  Serial2.write('c');
+}
+
+void loop(){
+  myFile = SD.open("15.txt", FILE_WRITE);       
+    String inByte2 = Serial2.readString();
+    String inByte1 = Serial1.readString();
+    Serial.print(inByte2);
+    myFile.println(inByte2);
+    Serial.print(inByte1);
+    myFile.println(inByte1);
+
+
+  myFile.close();
+}
