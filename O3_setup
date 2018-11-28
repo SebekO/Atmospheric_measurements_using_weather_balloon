@@ -50,7 +50,7 @@ void setup() //Setup intended for first time setup of SDK. Must initialize both 
   Serial.println(mySensor.getFW());  // Retruns FW date
   Serial.println();
 
-  if (mySensor.setBC("071615011247 110406 O3 1807 41.51")) Serial.println("Finished Setting BC");  //Enter your barcode string. Returns 1/0.
+  if (mySensor.setBC("061318011028 110406 O3 1807 -41.51")) Serial.println("Finished Setting BC");  //Enter your barcode string. Returns 1/0.
 
   mySensor.getEEPROM();  //Read eeprom into array and/or list view if DEBUG is TRUE. See end of sketch for outline of values.
   Serial.println();
