@@ -1,3 +1,4 @@
+//Createt by SebekO https://github.com/SebekO use edited lib DGS from https://github.com/SPEC-Sensors/DGS
 #include <SD.h>
 #include <SPI.h>
 #include "DGS.h"
@@ -43,11 +44,15 @@ void setup(){
   mySensor3.DEBUG = false; 
   Serial.println("Finished Setup 2/2");
   Serial.println();
+  ///////////////////////////////////////////////////HELP////////////////////////////////////////
+  Serial.println("Press: 'e' to show Sensor Data; 'f' to show Firmware Date; 'Z' to set it 0 current reading ");
+  Serial.println();
   Serial.println("Data: serial_n0 conc  temp  hum time");
 }
 
 void loop(){
-  myFile = SD.open("36.txt", FILE_WRITE);
+  ///////////////////////////////////////////////////DATA_READING////////////////////////////////////////
+  myFile = SD.open("37.txt", FILE_WRITE);
     if (myFile) {
       mySensor1.getData('\r');
       mySensor2.getData('\r');
@@ -67,7 +72,7 @@ void loop(){
       long time1=(mySensor1.getTime('s'));
       long time2=(mySensor2.getTime('s'));
       long time3=(mySensor3.getTime('s'));
-
+  ///////////////////////////////////////////////////DATA_WRITING_TO_FILE////////////////////////////////////////
       myFile.print(serial_n1);
       myFile.print('\t');
       myFile.print(conc1);
@@ -95,7 +100,7 @@ void loop(){
       myFile.print(hum3);
       myFile.print('\t');
       myFile.println(time3);
-      
+  ///////////////////////////////////////////////////DATA_WRITING_TO_SERIAL////////////////////////////////////////
       Serial.print(serial_n1);
       Serial.print('\t');
       Serial.print(conc1);
