@@ -409,11 +409,10 @@ long DGS::getTime(char s)
 String DGS::getId(char i)
 {
   if (i == 'i'){
-	  return (eepromStr[1]);
+	  return (eepromStr[1].remove(12));
 	  }
   else {
-	  Serial.print(eepromStr[1]);
-	  return 1;
+	  return (eepromStr[1].remove(12));
 	  }
 }
 
