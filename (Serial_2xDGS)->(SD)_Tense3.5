@@ -28,17 +28,16 @@ void setup(){
   Serial.println("Finished Setup 1/2");
   ///////////////////////////////////////////////////DGS////////////////////////////////////////
   Serial.println("Begin Setup DGS");
-  mySensor1.DEBUG = false;
-  mySensor2.DEBUG = false; 
-  Serial.println("Enter 'e' to download data");
-  while (Serial.read() != 'e') {}
+  delay(1000);
   mySensor1.DEBUG = true;
   mySensor2.DEBUG = true;
   mySensor1.getEEPROM();
   mySensor2.getEEPROM();
+  mySensor1.DEBUG = false;
+  mySensor2.DEBUG = false; 
   Serial.println("Finished Setup 2/2");
   Serial.println();
-  Serial.println("Data: serial_n0 time conc temp hum");
+  Serial.println("Data: serial_n0 conc  temp  hum time");
 }
 
 void loop(){
