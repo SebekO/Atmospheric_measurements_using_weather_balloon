@@ -408,11 +408,12 @@ long DGS::getTime(char s)
 }
 String DGS::getId(char i)
 {
+	static int z=(eepromStr[1].length()-1);
   if (i == 'i'){
-	  return (eepromStr[1].remove(12));
+	  return (eepromStr[1].remove(z));
 	  }
   else {
-	  return (eepromStr[1].remove(12));
+	  return (eepromStr[1].remove(z));
 	  }
 }
 
