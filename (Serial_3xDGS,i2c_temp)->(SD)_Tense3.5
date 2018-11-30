@@ -1,0 +1,196 @@
+//Created by SebekO https://github.com/SebekO used edited lib DGS from https://github.com/SPEC-Sensors/DGS
+#include <SD.h>
+#include <SPI.h>
+#include "DGS.h"
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+File myFile;
+const int chipSelect = BUILTIN_SDCARD;
+DGS mySensor1(&Serial1);
+DGS mySensor2(&Serial2);
+DGS mySensor3(&Serial3);
+#define ONE_WIRE_BUS 3
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+DeviceAddress insideThermometer;
+
+void setup(){
+  Serial.begin(9600);
+  Serial1.begin(9600);
+  Serial2.begin(9600);
+  Serial3.begin(9600);
+  Serial.flush();
+  Serial1.flush();
+  Serial2.flush();
+  Serial3.flush();
+  
+  
+  while (!Serial) {
+  }
+  //////////////////////////////////////////////////SD//////////////////////////////////////////
+  Serial.print("Initializing SD card...");
+  if (!SD.begin(chipSelect)) {
+    Serial.println("initialization failed!");
+    return;
+  }
+  Serial.println("initialization done.");
+  Serial.println("Finished Setup 1/2");
+  //////////////////////////////////////////////////TEMP_SENSOR//////////////////////////////////////////
+  sensors.begin();// Start up the library DallasTemperature
+  Serial.print("Found ");
+  Serial.print(sensors.getDeviceCount(), DEC);
+  Serial.println(" devices.");
+  Serial.print("Parasite power is: "); 
+  if (sensors.isParasitePowerMode()) Serial.println("ON");
+  else Serial.println("OFF");
+  if (!sensors.getAddress(insideThermometer, 0)) Serial.println("Unable to find address for Device 0"); 
+  Serial.print("Device 0 Address: ");
+  printAddress(insideThermometer);
+  Serial.println();
+  Serial.print("Device 0 Resolution: ");
+  Serial.print(sensors.getResolution(insideThermometer), DEC); 
+  Serial.println();
+  ///////////////////////////////////////////////////DGS////////////////////////////////////////
+  Serial.println("Begin Setup DGS");
+  delay(1000);
+  mySensor1.DEBUG = true;
+  mySensor2.DEBUG = true;
+  mySensor3.DEBUG = true;
+  mySensor1.getEEPROM();
+  mySensor2.getEEPROM();
+  mySensor3.getEEPROM();
+  mySensor1.DEBUG = false;
+  mySensor2.DEBUG = false;
+  mySensor3.DEBUG = false; 
+  Serial.println("Finished Setup 2/2");
+  Serial.println();
+  ///////////////////////////////////////////////////HELP////////////////////////////////////////
+  Serial.println("Press: 'e' to show Sensor Data; 'f' to show Firmware Date; 'Z' to set it 0 current reading ");
+  Serial.println();
+  Serial.println("Data: serial_n0 conc  temp  hum time");
+}
+
+void loop(){
+  ///////////////////////////////////////////////////DATA_READING////////////////////////////////////////
+  myFile = SD.open("38.txt", FILE_WRITE);
+    if (myFile) {
+      
+      mySensor1.getData('\r');
+      mySensor2.getData('\r');
+      mySensor3.getData('\r');
+      String serial_n1= mySensor1.getId('i');
+      String serial_n2= mySensor2.getId('i');
+      String serial_n3= mySensor3.getId('i');
+      long conc1=(mySensor1.getConc('c'));
+      long conc2=(mySensor2.getConc('c'));
+      long conc3=(mySensor3.getConc('c'));
+      long temp1=(mySensor1.getTemp('c'));
+      long temp2=(mySensor2.getTemp('c'));
+      long temp3=(mySensor3.getTemp('c'));
+      long hum1=(mySensor1.getRh('c'));
+      long hum2=(mySensor2.getRh('c'));
+      long hum3=(mySensor3.getRh('c'));
+      long time1=(mySensor1.getTime('s'));
+      long time2=(mySensor2.getTime('s'));
+      long time3=(mySensor3.getTime('s'));
+      
+      sensors.requestTemperatures(); // Send the command to get temperatures  
+      float tempC = sensors.getTempC(insideThermometer);
+  ///////////////////////////////////////////////////DATA_WRITING_TO_FILE////////////////////////////////////////
+      myFile.print(serial_n1);
+      myFile.print('\t');
+      myFile.print(conc1);
+      myFile.print('\t');
+      myFile.print(temp1);
+      myFile.print('\t');
+      myFile.print(hum1);
+      myFile.print('\t');
+      myFile.println(time1);
+      myFile.print(serial_n2);
+      myFile.print('\t');
+      myFile.print(conc2);
+      myFile.print('\t');
+      myFile.print(temp2);
+      myFile.print('\t');
+      myFile.print(hum2);
+      myFile.print('\t');
+      myFile.println(time2);
+      myFile.print(serial_n3);
+      myFile.print('\t');
+      myFile.print(conc3);
+      myFile.print('\t');
+      myFile.print(temp3);
+      myFile.print('\t');
+      myFile.print(hum3);
+      myFile.print('\t');
+      myFile.println(time3);
+      myFile.println(tempC);
+  ///////////////////////////////////////////////////DATA_WRITING_TO_SERIAL////////////////////////////////////////
+      Serial.print(serial_n1);
+      Serial.print('\t');
+      Serial.print(conc1);
+      Serial.print('\t');
+      Serial.print(temp1);
+      Serial.print('\t');
+      Serial.print(hum1);
+      Serial.print('\t');
+      Serial.println(time1);
+      Serial.print(serial_n2);
+      Serial.print('\t');
+      Serial.print(conc2);
+      Serial.print('\t');
+      Serial.print(temp2);
+      Serial.print('\t');
+      Serial.print(hum2);
+      Serial.print('\t');
+      Serial.println(time2);
+      Serial.print(serial_n3);
+      Serial.print('\t');
+      Serial.print(conc3);
+      Serial.print('\t');
+      Serial.print(temp3);
+      Serial.print('\t');
+      Serial.print(hum3);
+      Serial.print('\t');
+      Serial.println(time3);
+      Serial.println(tempC);
+      
+      myFile.close();
+    } 
+  else {
+    Serial.println("error opening file.txt");
+  }
+  while (Serial.available()) // read from Serial port, send to port SDK port
+  {
+    char U = Serial.read();
+    if (U == 'Z') {
+      if (mySensor1.zero()) Serial.println("Finished Setting Sensor 1 Zero"); //zeros returns 1/0
+      if (mySensor2.zero()) Serial.println("Finished Setting Sensor 2 Zero"); //zeros returns 1/0
+      if (mySensor3.zero()) Serial.println("Finished Setting Sensor 3 Zero"); //zeros returns 1/0
+    }
+    if (U == 'f') {
+      Serial.print(mySensor1.getFW());
+      Serial.print(", ");
+      Serial.print(mySensor2.getFW());
+      Serial.print(", ");
+      Serial.println(mySensor3.getFW());
+    }
+    if (U == 'e') {
+      mySensor1.DEBUG = true;
+      mySensor2.DEBUG = true;
+      mySensor3.DEBUG = true;
+      mySensor1.getEEPROM();
+      mySensor2.getEEPROM();
+      mySensor3.getEEPROM();
+    }
+  }
+}
+void printAddress(DeviceAddress deviceAddress)
+{
+  for (uint8_t i = 0; i < 8; i++)
+  {
+    if (deviceAddress[i] < 16) Serial.print("0");
+    Serial.print(deviceAddress[i], HEX);
+  }
+}
