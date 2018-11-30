@@ -1,0 +1,163 @@
+//Created by SebekO https://github.com/SebekO used edited lib DGS from https://github.com/SPEC-Sensors/DGS#include <SD.h>
+#include <SPI.h>
+#include <SD.h>
+#include "DGS.h"
+
+File myFile;
+const int chipSelect = BUILTIN_SDCARD;
+DGS mySensor1(&Serial1);
+DGS mySensor2(&Serial2);
+DGS mySensor3(&Serial3);
+
+void setup(){
+  Serial4.begin(57600);
+  delay(1000);
+  Serial4.println("1");
+  Serial1.begin(9600);
+  delay(1000);
+  Serial4.println("2");
+  Serial2.begin(9600);
+  delay(1000);
+  Serial4.println("3");
+  Serial3.begin(9600);
+  delay(1000);
+  Serial4.println("4");
+
+  
+  //////////////////////////////////////////////////SD//////////////////////////////////////////
+  Serial4.print("Initializing SD card...");
+  if (!SD.begin(chipSelect)) {
+    Serial4.println("initialization failed!");
+    return;
+  }
+  Serial4.println("initialization done.");
+  Serial4.println("Finished Setup 1/2");
+  ///////////////////////////////////////////////////DGS////////////////////////////////////////
+  Serial4.println("Begin Setup DGS");
+      mySensor1.DEBUG = true;
+      mySensor2.DEBUG = true;
+      mySensor3.DEBUG = true;
+      mySensor1.getData('\r');
+      mySensor2.getData('\r');
+      mySensor3.getData('\r');
+      mySensor1.getEEPROM();
+      mySensor2.getEEPROM();
+      mySensor3.getEEPROM();
+
+  Serial4.println("Finished Setup 2/2");
+  Serial4.println();
+  ///////////////////////////////////////////////////HELP////////////////////////////////////////
+  Serial4.println("Press: 'e' to show Sensor Data; 'f' to show Firmware Date; 'Z' to set it 0 current reading ");
+  Serial4.println();
+  Serial4.println("Data: serial_n0 conc  temp  hum time");
+}
+
+void loop(){
+  ///////////////////////////////////////////////////DATA_READING////////////////////////////////////////
+  myFile = SD.open("37.txt", FILE_WRITE);
+    if (myFile) {
+      mySensor1.getData('\r');
+      mySensor2.getData('\r');
+      mySensor3.getData('\r');
+      String serial_n1= mySensor1.getId('i');
+      String serial_n2= mySensor2.getId('i');
+      String serial_n3= mySensor3.getId('i');
+      long conc1=(mySensor1.getConc('c'));
+      long conc2=(mySensor2.getConc('c'));
+      long conc3=(mySensor3.getConc('c'));
+      long temp1=(mySensor1.getTemp('c'));
+      long temp2=(mySensor2.getTemp('c'));
+      long temp3=(mySensor3.getTemp('c'));
+      long hum1=(mySensor1.getRh('c'));
+      long hum2=(mySensor2.getRh('c'));
+      long hum3=(mySensor3.getRh('c'));
+      long time1=(mySensor1.getTime('s'));
+      long time2=(mySensor2.getTime('s'));
+      long time3=(mySensor3.getTime('s'));
+  ///////////////////////////////////////////////////DATA_WRITING_TO_FILE////////////////////////////////////////
+      myFile.print(serial_n1);
+      myFile.print('\t');
+      myFile.print(conc1);
+      myFile.print('\t');
+      myFile.print(temp1);
+      myFile.print('\t');
+      myFile.print(hum1);
+      myFile.print('\t');
+      myFile.println(time1);
+      myFile.print(serial_n2);
+      myFile.print('\t');
+      myFile.print(conc2);
+      myFile.print('\t');
+      myFile.print(temp2);
+      myFile.print('\t');
+      myFile.print(hum2);
+      myFile.print('\t');
+      myFile.println(time2);
+      myFile.print(serial_n3);
+      myFile.print('\t');
+      myFile.print(conc3);
+      myFile.print('\t');
+      myFile.print(temp3);
+      myFile.print('\t');
+      myFile.print(hum3);
+      myFile.print('\t');
+      myFile.println(time3);
+  ///////////////////////////////////////////////////DATA_WRITING_TO_SERIAL////////////////////////////////////////
+      Serial4.print(serial_n1);
+      Serial4.print('\t');
+      Serial4.print(conc1);
+      Serial4.print('\t');
+      Serial4.print(temp1);
+      Serial4.print('\t');
+      Serial4.print(hum1);
+      Serial4.print('\t');
+      Serial4.println(time1);
+      Serial4.print(serial_n2);
+      Serial4.print('\t');
+      Serial4.print(conc2);
+      Serial4.print('\t');
+      Serial4.print(temp2);
+      Serial4.print('\t');
+      Serial4.print(hum2);
+      Serial4.print('\t');
+      Serial4.println(time2);
+      Serial4.print(serial_n3);
+      Serial4.print('\t');
+      Serial4.print(conc3);
+      Serial4.print('\t');
+      Serial4.print(temp3);
+      Serial4.print('\t');
+      Serial4.print(hum3);
+      Serial4.print('\t');
+      Serial4.println(time3);
+
+      myFile.close();
+    } 
+  else {
+    Serial4.println("error opening file.txt");
+  }
+  while (Serial4.available()) // read from Serial port, send to port SDK port
+  {
+    char U = Serial4.read();
+    if (U == 'Z') {
+      if (mySensor1.zero()) Serial4.println("Finished Setting Sensor 1 Zero"); //zeros returns 1/0
+      if (mySensor2.zero()) Serial4.println("Finished Setting Sensor 2 Zero"); //zeros returns 1/0
+      if (mySensor3.zero()) Serial4.println("Finished Setting Sensor 3 Zero"); //zeros returns 1/0
+    }
+    if (U == 'f') {
+      Serial4.print(mySensor1.getFW());
+      Serial4.print(", ");
+      Serial4.print(mySensor2.getFW());
+      Serial4.print(", ");
+      Serial4.println(mySensor3.getFW());
+    }
+    if (U == 'e') {
+      mySensor1.DEBUG = true;
+      mySensor2.DEBUG = true;
+      mySensor3.DEBUG = true;
+      mySensor1.getEEPROM();
+      mySensor2.getEEPROM();
+      mySensor3.getEEPROM();
+    }
+  }
+}
