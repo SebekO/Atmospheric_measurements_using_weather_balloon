@@ -1,25 +1,19 @@
-/*
-The sensor outputs provided by the library are the raw
-16-bit values obtained by concatenating the 8-bit high and
-low accelerometer and gyro data registers. They can be
-converted to units of g and dps (degrees per second) using
-the conversion factors specified in the datasheet for your
-particular device and full scale setting (gain).
-
-Example: An LSM6DS33 gives an accelerometer Z axis reading
-of 16276 with its default full scale setting of +/- 2 g. The
-LA_So specification in the LSM6DS33 datasheet (page 15)
-states a conversion factor of 0.061 mg/LSB (least
-significant bit) at this FS setting, so the raw reading of
-16276 corresponds to 16276 * 0.061 = 992.8 mg = 0.9928 g.
-*/
-
 #include <Wire.h>
 #include <LSM6.h>
 #include <LPS.h>
+#include <LIS3MDL.h>
+#include <DFRobot_BME280.h>
+
+#define SEA_LEVEL_PRESSURE  1013.25f
+#define BME_CS 10
 
 LSM6 imu;
 LPS ps;
+LIS3MDL mag;
+DFRobot_BME280 bme; //I2C
+float temp, pa, hum, alt;
+
+char report_mag[80];
 char report[80];
 
 void setup()
@@ -37,8 +31,18 @@ void setup()
     Serial.println("Failed to autodetect pressure sensor!");
     while (1);
   }
+  if (!mag.init())
+  {
+    Serial.println("Failed to detect and initialize magnetometer!");
+    while (1);
+  }
+  if (!bme.begin(0x77)) {
+        Serial.println("No sensor device found, check line or address!");
+        while (1);
+    }
   imu.enableDefault();
   ps.enableDefault();
+  mag.enableDefault();
 }
 
 void loop()
@@ -49,6 +53,12 @@ void loop()
     imu.a.x, imu.a.y, imu.a.z,
     imu.g.x, imu.g.y, imu.g.z);
   Serial.println(report);
+  mag.read();
+
+  snprintf(report_mag, sizeof(report_mag), "M: %6d %6d %6d",
+    mag.m.x, mag.m.y, mag.m.z);
+  Serial.println(report_mag);
+  
   float pressure = ps.readPressureInchesHg();
   float altitude = ps.pressureToAltitudeFeet(pressure);
   float temperature = ps.readTemperatureF();
@@ -60,6 +70,20 @@ void loop()
   Serial.print(" ft\tt: ");
   Serial.print(temperature);
   Serial.println(" deg F");
+  temp = bme.temperatureValue();
+  pa = bme.pressureValue();
+  hum = bme.humidityValue();
+  alt = bme.altitudeValue(SEA_LEVEL_PRESSURE);
+  
+  Serial.print("BME: ");
+  Serial.print(temp);
+  Serial.print(" C ");
+  Serial.print(pa);
+  Serial.print(" Pa ");
+  Serial.print(hum);
+  Serial.println(" % ");
+  Serial.print(alt);
+  Serial.println(" m");
   delay(1000);
 
 }
