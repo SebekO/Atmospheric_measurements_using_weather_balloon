@@ -11,13 +11,10 @@ DGS mySensor3(&Serial3);
 
 void setup(){
   Serial4.begin(57600);
-  delay(1000);
   Serial1.begin(9600);
-  delay(1000);
   Serial2.begin(9600);
-  delay(1000);
   Serial3.begin(9600);
-  delay(1000);
+  delay(5000);
 //////////////////////////////////////////////////SD//////////////////////////////////////////
   Serial4.print("Initializing SD card...");
   if (!SD.begin(chipSelect)) {
