@@ -59,8 +59,8 @@ void loop()
     mag.m.x, mag.m.y, mag.m.z);
   Serial.println(report_mag);
   
-  float pressure = ps.readPressureInchesHg();
-  float altitude = ps.pressureToAltitudeFeet(pressure);
+  float pressure = ps.readPressureMillibars();
+  float altitude = ps.pressureToAltitudeMeters(pressure);
   float temperature = ps.readTemperatureF();
 
   Serial.print("p: ");
@@ -81,7 +81,7 @@ void loop()
   Serial.print(pa);
   Serial.print(" Pa ");
   Serial.print(hum);
-  Serial.println(" % ");
+  Serial.print(" % ");
   Serial.print(alt);
   Serial.println(" m");
   delay(1000);
