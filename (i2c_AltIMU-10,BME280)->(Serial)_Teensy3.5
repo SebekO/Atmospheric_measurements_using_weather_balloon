@@ -49,41 +49,45 @@ void loop()
 {
   imu.read();
 
-  snprintf(report, sizeof(report), "A: %6d %6d %6d\nG: %6d %6d %6d",
+  snprintf(report, sizeof(report), "A: %6d x %6d y %6d z\nG: %6d x %6d y %6d z",
     imu.a.x, imu.a.y, imu.a.z,
     imu.g.x, imu.g.y, imu.g.z);
   Serial.println(report);
   mag.read();
 
-  snprintf(report_mag, sizeof(report_mag), "M: %6d %6d %6d",
+  snprintf(report_mag, sizeof(report_mag), "M: %6d x %6d y %6d z",
     mag.m.x, mag.m.y, mag.m.z);
   Serial.println(report_mag);
   
-  float pressure = ps.readPressureMillibars();
-  float altitude = ps.pressureToAltitudeMeters(pressure);
-  float temperature = ps.readTemperatureF();
-
-  Serial.print("p: ");
-  Serial.print(pressure);
-  Serial.print(" inHg\ta: ");
-  Serial.print(altitude);
-  Serial.print(" ft\tt: ");
+  float pressure = ps.readPressureMillibars()*100;
+  float altitude = ps.pressureToAltitudeMeters(pressure/100);
+  float temperature = ps.readTemperatureC();
+  float z = ps.readPressureRaw()/ 4096;
+ // Serial.println(z);
+  
+  Serial.print("AltMU: ");
   Serial.print(temperature);
-  Serial.println(" deg F");
+  Serial.print(" C ");
+  Serial.print(pressure);
+  Serial.print(" Pa ");
+  Serial.print(altitude);
+  Serial.println(" m");
+
+  
   temp = bme.temperatureValue();
   pa = bme.pressureValue();
   hum = bme.humidityValue();
   alt = bme.altitudeValue(SEA_LEVEL_PRESSURE);
   
-  Serial.print("BME: ");
+  Serial.print("BME:   ");
   Serial.print(temp);
   Serial.print(" C ");
   Serial.print(pa);
   Serial.print(" Pa ");
-  Serial.print(hum);
-  Serial.print(" % ");
   Serial.print(alt);
-  Serial.println(" m");
+  Serial.print(" m ");
+  Serial.print(hum);
+  Serial.println(" %");
   delay(1000);
-
+  
 }
