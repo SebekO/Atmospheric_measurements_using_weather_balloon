@@ -1,4 +1,4 @@
-//Created by SebekO https://github.com/SebekO used edited lib DGS from https://github.com/SPEC-Sensors/DGS#include <SD.h>
+//Created by SebekO https://github.com/SebekO used edited lib DGS from https://github.com/SPEC-Sensors/DGS#include
 #include <SPI.h>
 #include <SD.h>
 #include <Wire.h>
@@ -7,8 +7,18 @@
 #include <LIS3MDL.h>
 #include <DFRobot_BME280.h>
 #include "DGS.h"
-
-File myFile;
+struct all{
+  File myFile;
+  float temp, pa, hum, alt;
+  char report_mag[80];
+  char report[80];
+  String serial_n1, serial_n2, serial_n3;
+  long conc1, conc2, conc3;
+  long temp1, temp2, temp3;
+  long hum1, hum2, hum3;
+  long time1, time2, time3;
+  float pressure, altitude, temperature;
+} dane;
 const int chipSelect = BUILTIN_SDCARD;
 DGS mySensor1(&Serial1);
 DGS mySensor2(&Serial2);
@@ -20,10 +30,7 @@ LSM6 imu;
 LPS ps;
 LIS3MDL mag;
 DFRobot_BME280 bme; //I2C
-float temp, pa, hum, alt;
 
-char report_mag[80];
-char report[80];
 
 void setup(){
   Serial4.begin(57600);
@@ -86,134 +93,47 @@ void setup(){
 }
 
 void loop(){
-    myFile = SD.open("38.txt", FILE_WRITE); //file open
-    if (myFile) {
+    dane.myFile = SD.open("38.txt", FILE_WRITE); //file open
+    if (dane.myFile) {
 ///////////////////////////////////////////////////DATA_READING////////////////////////////////////////
       /////////////////////////////////////////////DGS/////////////////////////////////////////////////
       mySensor1.getData('\r');
       mySensor2.getData('\r');
       mySensor3.getData('\r');
-      String serial_n1= mySensor1.getId('i');
-      String serial_n2= mySensor2.getId('i');
-      String serial_n3= mySensor3.getId('i');
-      long conc1=(mySensor1.getConc('c'));
-      long conc2=(mySensor2.getConc('c'));
-      long conc3=(mySensor3.getConc('c'));
-      long temp1=(mySensor1.getTemp('c'));
-      long temp2=(mySensor2.getTemp('c'));
-      long temp3=(mySensor3.getTemp('c'));
-      long hum1=(mySensor1.getRh('c'));
-      long hum2=(mySensor2.getRh('c'));
-      long hum3=(mySensor3.getRh('c'));
-      long time1=(mySensor1.getTime('s'));
-      long time2=(mySensor2.getTime('s'));
-      long time3=(mySensor3.getTime('s'));
+      dane.serial_n1= mySensor1.getId('i');
+      dane.serial_n2= mySensor2.getId('i');
+      dane.serial_n3= mySensor3.getId('i');
+      dane.conc1=(mySensor1.getConc('c'));
+      dane.conc2=(mySensor2.getConc('c'));
+      dane.conc3=(mySensor3.getConc('c'));
+      dane.temp1=(mySensor1.getTemp('c'));
+      dane.temp2=(mySensor2.getTemp('c'));
+      dane.temp3=(mySensor3.getTemp('c'));
+      dane.hum1=(mySensor1.getRh('c'));
+      dane.hum2=(mySensor2.getRh('c'));
+      dane.hum3=(mySensor3.getRh('c'));
+      dane.time1=(mySensor1.getTime('s'));
+      dane.time2=(mySensor2.getTime('s'));
+      dane.time3=(mySensor3.getTime('s'));
       ////////////////////////////////////////////AltIMU-10///////////////////////////////////////////
       imu.read();
-      snprintf(report, sizeof(report), "A: %6d x %6d y %6d z G: %6d x %6d y %6d z",
+      snprintf(dane.report, sizeof(dane.report), "A: %6d x %6d y %6d z G: %6d x %6d y %6d z",
       imu.a.x, imu.a.y, imu.a.z,
       imu.g.x, imu.g.y, imu.g.z);
-      Serial4.println(report);
       mag.read();
-      snprintf(report_mag, sizeof(report_mag), "M: %6d x %6d y %6d z",
-       mag.m.x, mag.m.y, mag.m.z);
-      Serial4.println(report_mag); 
-      float pressure = ps.readPressureMillibars()*100;
-      float altitude = ps.pressureToAltitudeMeters(pressure/100);
-      float temperature = ps.readTemperatureC();
+      snprintf(dane.report_mag, sizeof(dane.report_mag), "M: %6d x %6d y %6d z",
+      mag.m.x, mag.m.y, mag.m.z);  
+      dane.pressure = ps.readPressureMillibars()*100;
+      dane.altitude = ps.pressureToAltitudeMeters(dane.pressure/100);
+      dane.temperature = ps.readTemperatureC();
       //////////////////////////////////////////BEM280//////////////////////////////////////////////////////
-      temp = bme.temperatureValue();
-      pa = bme.pressureValue();
-      hum = bme.humidityValue();
-      alt = bme.altitudeValue(SEA_LEVEL_PRESSURE);
-///////////////////////////////////////////////////DATA_WRITING_TO_FILE/////////////////////////////////////
-      myFile.print(serial_n1);
-      myFile.print('\t');
-      myFile.print(conc1);
-      myFile.print('\t');
-      myFile.print(temp1);
-      myFile.print('\t');
-      myFile.print(hum1);
-      myFile.print('\t');
-      myFile.println(time1);
-      myFile.print(serial_n2);
-      myFile.print('\t');
-      myFile.print(conc2);
-      myFile.print('\t');
-      myFile.print(temp2);
-      myFile.print('\t');
-      myFile.print(hum2);
-      myFile.print('\t');
-      myFile.println(time2);
-      myFile.print(serial_n3);
-      myFile.print('\t');
-      myFile.print(conc3);
-      myFile.print('\t');
-      myFile.print(temp3);
-      myFile.print('\t');
-      myFile.print(hum3);
-      myFile.print('\t');
-      myFile.println(time3);
-      myFile.print("AltMU: ");
-      myFile.print(temperature);
-      myFile.print(" C ");
-      myFile.print(pressure);
-      myFile.print(" Pa ");
-      myFile.print(altitude);
-      myFile.println(" m ");
-      myFile.print("BME:   ");
-      myFile.print(temp);
-      myFile.print(" C ");
-      myFile.print(pa);
-      myFile.print(" Pa ");
-      myFile.print(alt);
-      myFile.println(" m ");
-      myFile.close();
-///////////////////////////////////////////////////DATA_WRITING_TO_SERIAL4////////////////////////////////////////
-      Serial4.print(serial_n1);
-      Serial4.print('\t');
-      Serial4.print(conc1);
-      Serial4.print('\t');
-      Serial4.print(temp1);
-      Serial4.print('\t');
-      Serial4.print(hum1);
-      Serial4.print('\t');
-      Serial4.println(time1);
-      Serial4.print(serial_n2);
-      Serial4.print('\t');
-      Serial4.print(conc2);
-      Serial4.print('\t');
-      Serial4.print(temp2);
-      Serial4.print('\t');
-      Serial4.print(hum2);
-      Serial4.print('\t');
-      Serial4.println(time2);
-      Serial4.print(serial_n3);
-      Serial4.print('\t');
-      Serial4.print(conc3);
-      Serial4.print('\t');
-      Serial4.print(temp3);
-      Serial4.print('\t');
-      Serial4.print(hum3);
-      Serial4.print('\t');
-      Serial4.println(time3);
-      Serial4.print("AltMU: ");
-      Serial4.print(temperature);
-      Serial4.print(" C ");
-      Serial4.print(pressure);
-      Serial4.print(" Pa ");
-      Serial4.print(altitude);
-      Serial4.println(" m ");
-      Serial4.print("BME:   ");
-      Serial4.print(temp);
-      Serial4.print(" C ");
-      Serial4.print(pa);
-      Serial4.print(" Pa ");
-      Serial4.print(alt);
-      Serial4.println(" m ");
-///////////////////////////////////////////////////DATA_WRITING_TO_SERIAL////////////////////////////////////////
-  wypisz_serial(serial_n1, conc1, temp1, hum1, time1, report, report_mag, temp, pa, hum, alt, pressure, altitude, temperature);
-
+      dane.temp = bme.temperatureValue();
+      dane.pa = bme.pressureValue();
+      dane.hum = bme.humidityValue();
+      dane.alt = bme.altitudeValue(SEA_LEVEL_PRESSURE);
+  wypisz_pc(dane);
+  wypisz_433(dane); 
+  zapisz_SD(dane);
     }
   else {
     Serial4.println("error opening file");
