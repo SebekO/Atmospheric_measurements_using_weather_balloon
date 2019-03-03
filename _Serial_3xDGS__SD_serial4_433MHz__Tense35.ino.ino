@@ -1,4 +1,11 @@
-//Created by SebekO https://github.com/SebekO used edited lib DGS from https://github.com/SPEC-Sensors/DGS#include
+/*
+Created by:
+Sebastian Owarzany
+Technical Physics
+Faculty of Physics and Applied Computer Science
+AGH University of Science and Technology
+*/
+//used edited lib DGS from https://github.com/SPEC-Sensors/DGS#include
 #include <SPI.h>
 #include <SD.h>
 #include <Wire.h>
