@@ -155,7 +155,7 @@ void setup()
 }
 void loop()
 {
-  dane.myFile = SD.open("2.txt", FILE_WRITE); //file open
+  dane.myFile = SD.open("3.txt", FILE_WRITE); //file open
   if (dane.myFile)
   {
     /////////////////////////////DGS////////////////////////////////////////////////////////////////////////////////DATA_READING
