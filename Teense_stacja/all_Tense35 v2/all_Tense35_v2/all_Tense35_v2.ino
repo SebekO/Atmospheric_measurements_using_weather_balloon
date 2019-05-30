@@ -177,7 +177,7 @@ void loop()
     dane.time1 = (mySensor1.getTime('s'));
     dane.time2 = (mySensor2.getTime('s'));
     dane.time3 = (mySensor3.getTime('s'));
-    ////////////////////////////////////////////AltIMU-10///////////////////////////////////////////////////////////DATA_READING
+    //////////////////////////////////////////AltIMU-10///////////////////////////////////////////////////////////DATA_READING
     imu.read();
     snprintf(dane.report, sizeof(dane.report), "65 %6d  %6d  %6d  \n 71 %6d  %6d  %6d",
     imu.a.x, imu.a.y, imu.a.z,
