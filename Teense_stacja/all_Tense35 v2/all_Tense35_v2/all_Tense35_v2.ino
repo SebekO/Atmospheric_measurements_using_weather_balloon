@@ -155,7 +155,7 @@ void setup()
 }
 void loop()
 {
-  dane.myFile = SD.open("3.txt", FILE_WRITE); //file open
+  dane.myFile = SD.open("auto1.txt", FILE_WRITE); //file open
   if (dane.myFile)
   {
     /////////////////////////////DGS////////////////////////////////////////////////////////////////////////////////DATA_READING
@@ -178,16 +178,16 @@ void loop()
     dane.time2 = (mySensor2.getTime('s'));
     dane.time3 = (mySensor3.getTime('s'));
     //////////////////////////////////////////AltIMU-10///////////////////////////////////////////////////////////DATA_READING
-    imu.read();
-    snprintf(dane.report, sizeof(dane.report), "65 %6d  %6d  %6d  \n 71 %6d  %6d  %6d",
-    imu.a.x, imu.a.y, imu.a.z,
-    imu.g.x, imu.g.y, imu.g.z);
-    mag.read();
-    snprintf(dane.report_mag, sizeof(dane.report_mag), "77 %6d  %6d  %6d ",
-    mag.m.x, mag.m.y, mag.m.z);  
-    dane.pressure = ps.readPressureMillibars()*100;
-    dane.altitude = ps.pressureToAltitudeMeters(dane.pressure/100);
-    dane.temperature = ps.readTemperatureC();
+//    imu.read();
+//    snprintf(dane.report, sizeof(dane.report), "65 %6d  %6d  %6d  \n 71 %6d  %6d  %6d",
+//    imu.a.x, imu.a.y, imu.a.z,
+//    imu.g.x, imu.g.y, imu.g.z);
+//    mag.read();
+//    snprintf(dane.report_mag, sizeof(dane.report_mag), "77 %6d  %6d  %6d ",
+//    mag.m.x, mag.m.y, mag.m.z);  
+//    dane.pressure = ps.readPressureMillibars()*100;
+//    dane.altitude = ps.pressureToAltitudeMeters(dane.pressure/100);
+//    dane.temperature = ps.readTemperatureC();
     //////////////////////////////////////////BEM280////////////////////////////////////////////////////////////////DATA_READING
     dane.temp = bme.temperatureValue();
     dane.pa = bme.pressureValue();
