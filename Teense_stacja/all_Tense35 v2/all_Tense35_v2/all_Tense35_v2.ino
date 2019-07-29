@@ -207,7 +207,6 @@ void loop()
     printFloat(gps.location.lng(), gps.location.isValid(), 12, 6);
     printDateTime(gps.date, gps.time);
     printFloat(gps.altitude.meters(), gps.altitude.isValid(), 7, 2);
-    printInt(gps.failedChecksum(), true, 9);
     Serial.println();
     Serial4.println();
     dane.myFile.println();

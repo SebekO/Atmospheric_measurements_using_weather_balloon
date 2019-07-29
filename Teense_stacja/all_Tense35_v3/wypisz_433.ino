@@ -1,7 +1,5 @@
 void wypisz_433(all danel)
 {
-  Serial4.println(dane.report);
-  Serial4.println(dane.report_mag);
   Serial4.print(dane.serial_n1);
   Serial4.print('\t');
   Serial4.print(dane.conc1);
@@ -29,13 +27,6 @@ void wypisz_433(all danel)
   Serial4.print(dane.hum3);
   Serial4.print('\t');
   Serial4.println(dane.time3);
-  Serial4.print("651081167785");
-  Serial4.print('\t');
-  Serial4.print(dane.temperature);
-  Serial4.print('\t');
-  Serial4.print(dane.pressure);
-  Serial4.print('\t');
-  Serial4.println(dane.altitude);
   Serial4.print("667769");
   Serial4.print('\t');
   Serial4.print(dane.temp);
