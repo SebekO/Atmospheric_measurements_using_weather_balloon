@@ -33,25 +33,25 @@ void setup()
   Serial3.begin(9600);
   Serial4.begin(57600);
   Serial5.begin(9600);
-  Serial4.println("#Initializing SD card...");
-  Serial.println("#Initializing SD card...");
+  Serial4.print("#Initializing SD card...");
+  Serial.print("#Initializing SD card...");
 
   if (!SD.begin(chipSelect)) {
     Serial.println("initialization failed!");
-    Serial4.println("#initialization failed!");
+    Serial4.print("#initialization failed!");
     return;
   }
   Serial.println("initialization done.");
-  Serial4.println("#initialization done.");
+  Serial4.print("#initialization done.");
   if (!bme.begin(0x77)) {
     Serial4.println("No sensor device found, check line or address!");
     while (1);
   }
-  Serial4.println("#Initializing DGS devices...");
-  Serial.println("#Initializing DGS devices...");
-  mySensor1.DEBUG = true;
-  mySensor2.DEBUG = true;
-  mySensor3.DEBUG = true;
+  Serial4.print("#Initializing DGS devices...");
+  Serial.print("#Initializing DGS devices...");
+  mySensor1.DEBUG = false;
+  mySensor2.DEBUG = false;
+  mySensor3.DEBUG = false;
   mySensor1.getData('\r');
   mySensor2.getData('\r');
   mySensor3.getData('\r');
@@ -94,9 +94,7 @@ void loop()
   Serial.println();
   Serial4.println();
   wypisz_pc(dane);
-  delay(100);
   wypisz_433(dane);
-  delay(100);
   zapisz_SD(dane);
   
   smartDelay(1000);
