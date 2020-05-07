@@ -13,7 +13,7 @@
 #include <DFRobot_BME280.h>
 
 TinyGPSPlus gps;
-#include "DGS.h"
+#include "DGS.h" //used edited lib DGS from https://github.com/SPEC-Sensors/DGS#include
 const int chipSelect = BUILTIN_SDCARD;
 
 struct all
