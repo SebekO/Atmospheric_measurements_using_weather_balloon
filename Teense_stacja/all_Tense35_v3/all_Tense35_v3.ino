@@ -1,3 +1,13 @@
+/*
+
+  Created 29.07.2019 by:
+  Sebastian Owarzany
+  Technical Physics
+  Faculty of Physics and Applied Computer Science
+  AGH University of Science and Technology
+  https://github.com/SebekO
+  
+*/
 #include <TinyGPS++.h>
 #include <SD.h>
 #include <DFRobot_BME280.h>
